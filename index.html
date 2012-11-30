@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>about:device</title>
+	<meta id="viewport" name="viewport" content ="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<link rel="apple-touch-icon-precomposed" href="icon-64.png">
+	<style>
+		html, body, h1 {
+			margin: 0;
+			padding: 0;
+		}
+		body {
+			margin: 10px;
+			font: 13px/18px sans-serif;
+		}
+		h1 {
+			font-size: 21px;
+			line-height: 21px;
+		}
+		h1 a {
+			float: right;
+			font-size: 13px;
+			font-weight: normal;
+			padding: 0 3px 0 3px;
+			font-size: 10px;
+			text-transform: uppercase;
+		}
+		dl {
+		}
+		dt, dd {
+			display: block;
+			padding: 0;
+			margin: 0;
+		}
+		dt {
+			font-weight: bold;
+			font-size: 10px;
+			text-transform: uppercase;
+			padding-top: 5px;
+			color: #999;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+		dd {
+			padding-bottom: 4px;
+			border-bottom: 1px dotted #eee;
+			color: #333;
+			white-space: pre-wrap;
+			background-color: #fff;
+			transition: background-color 0.5s;
+		}
+		dd.highlight {
+			background-color: #fffacd;
+		}
+	</style>
+</head>
+<body>
+	<h1>
+		about:device
+		<a href="javascript:location.href = location.href; false;">Refresh</a>
+		<a href="view-source:./suite.js">Source</a>
+		<a href="#" id="mailto">Mail</a>
+	</h1>
+	<dl id="list">
+		<dt>Open Link</dt>
+		<dd><a href="./index.html" target="_blank">_blank</a>, <a href="./index.html" target="new">new</a>, <a href="./index.html" onclick="javascript:window.open(this.href); false;">onclick</a></dd>
+	</dl>
+	<script>
+
+		function Suite(tests) {
+			this.element = document.getElementById('list');
+			this.tests = tests;
+			this.elements = {};
+			for (name in this.tests) {
+				this.run(name);
+			}
+			this.ready = true;
+		};
+
+		Suite.prototype = {
+
+			run: function(name) {
+				var element = this.elements[name] || null;
+				if (!element) {
+					var nameEl = document.createElement('dt');
+					nameEl.textContent = '\n\n' + name + '\n';
+					element = document.createElement('dd');
+					element.textContent = '';
+					this.element.appendChild(nameEl);
+					this.element.appendChild(element);
+				}
+				var test = this.tests[name];
+				var fn = this.result.bind(element);
+				try {
+					var ret = test(fn, this);
+					if (typeof ret == 'function') {
+						var trigger = document.createElement('button');
+						trigger.textContent = 'Run';
+						trigger.onclick = function() {
+							ret();
+						};
+						element.appendChild(trigger);
+					}
+				} catch (e) {
+					fn(e);
+				}
+
+			},
+
+			result: function(value) {
+				if (value) {
+					if (value instanceof Error || value instanceof DOMError) {
+						value = 'Error: ' + (value.message || value.name);
+					} else if (typeof value == 'object') {
+						value = Suite.clean(value);
+					}
+				}
+				this.textContent = String(value).trim();
+				this.classList.add('highlight');
+				var element = this;
+				setTimeout(function() {
+					element.classList.remove('highlight');
+				}, 500);
+				Suite.mailto();
+			}
+		};
+
+		Suite.mailto = function() {
+			var uri = 'mailto:?subject=';
+      uri += encodeURIComponent('about:device');
+      uri += "&body=";
+      uri += encodeURIComponent(document.getElementById('list').textContent.trim());
+      document.getElementById('mailto').href = uri;
+		};
+
+		Suite.clean = function(obj) {
+			var clone = {};
+			for (var key in obj) {
+				if (obj.hasOwnProperty(key) && obj[key] === undefined) {
+					obj[key] = 'undefined';
+				}
+				clone[key] = obj[key];
+			}
+			if (JSON.stringify(obj) == '{}') {
+				obj = clone;
+			}
+			return JSON.stringify(obj, null, 2).replace(/\s*[\{\[]$|^\s*[\}\]],?\n?|,$|^\s{2}/mg, '');
+		};
+	</script>
+	<script src="suite.js"></script>
+</body>
+</html>

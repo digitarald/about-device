@@ -1,0 +1,20 @@
+{
+  "version": "1.0",
+  "name": "about:device",
+  "description": "X-Ray for your app run-time.",
+  "icons": {
+    "64": "/icon-64.png"
+  },
+  "launch_path": "/about-device/index.html",
+  "developer": {
+    "name": "Mozilla Labs",
+    "url": "http://www.mozillalabs.com"
+  },
+  "type": "privileged",
+  "permissions": {
+    "systemXHR": {
+      "description": "Requesting the web."
+    }
+  },
+  "fullscreen": true
+}

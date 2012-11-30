@@ -1,0 +1,13 @@
+{
+  "name": "about:device",
+  "version": "1.0",
+  "icons": {
+    "64": "/icon-64.png"
+  },
+  "developer": {
+    "name": "Mozilla Labs",
+    "url": "http://www.mozillalabs.com"
+  },
+  "package_path": "/about-device/package.zip",
+  "size": 11574
+}
